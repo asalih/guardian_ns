@@ -1,0 +1,41 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version
+      - image:  circleci/golang:1.13
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    #### TEMPLATE_NOTE: go expects specific checkout path representing url
+    #### expecting it in the form of
+    ####   /go/src/github.com/circleci/go-tool
+    ####   /go/src/bitbucket.org/circleci/go-tool
+    working_directory: /go/src/github.com/asalih/guardian_ns
+    steps:
+      - checkout
+
+      # specify any bash command here prefixed with `run: `
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
+      - run:
+          name: Compile
+          command: make
+      - run:
+          name: Service Stop
+          command: ssh -o "StrictHostKeyChecking no" root@46.101.135.173 systemctl stop guardian.service
+      - run:
+          name: Deploy
+          command: scp -o StrictHostKeyChecking=no -r workdir/* root@46.101.135.173://applications/guardian_ns/
+      - run:
+          name: Copy json files
+          command: scp -o StrictHostKeyChecking=no -r /go/src/github.com/asalih/guardian_ns/*.json root@46.101.135.173://applications/guardian_ns/
+      - run:
+          name: Service Start
+          command: ssh -o "StrictHostKeyChecking no" root@46.101.135.173 systemctl start guardian_ns.service
