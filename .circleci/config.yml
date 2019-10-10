@@ -29,7 +29,7 @@ jobs:
           command: make
       - run:
           name: Service Stop
-          command: ssh -o "StrictHostKeyChecking no" root@46.101.135.173 systemctl stop guardian.service
+          command: ssh -o "StrictHostKeyChecking no" root@46.101.135.173 systemctl stop guardian_ns.service
       - run:
           name: Deploy
           command: scp -o StrictHostKeyChecking=no -r workdir/* root@46.101.135.173://applications/guardian_ns/
