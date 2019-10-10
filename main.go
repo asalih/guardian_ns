@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asalih/guardian/models"
+	"github.com/asalih/guardian_ns/models"
 	"github.com/miekg/dns"
 )
 
