@@ -29,8 +29,11 @@ func NewDNSHandler() *DNSHandler {
 //ServeDNS ...
 func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
+	fmt.Println("Incoming Message;")
 
 	fmt.Println(r)
+	fmt.Println("Qt")
+	fmt.Println(r.Questions)
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
