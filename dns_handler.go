@@ -29,7 +29,6 @@ func NewDNSHandler() *DNSHandler {
 //ServeDNS ...
 func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
-	msg.SetReply(r)
 
 	fmt.Println(r)
 	switch r.Question[0].Qtype {
@@ -38,6 +37,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		domain := msg.Question[0].Name
 		address, ok := h.Targets[domain]
 
+		fmt.Println("Incoming Domain :" + domain)
 		fmt.Println(h.Targets)
 		fmt.Println(address)
 		fmt.Println(ok)
