@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"sync"
 
@@ -19,6 +20,7 @@ type DNSHandler struct {
 //NewDNSHandler Init dns handler
 func NewDNSHandler() *DNSHandler {
 	handler := &DNSHandler{nil, &data.DNSDBHelper{}, sync.Mutex{}}
+	fmt.Println("Dns Handling init")
 
 	handler.LoadTargets()
 
@@ -33,6 +35,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	case dns.TypeA:
 		msg.Authoritative = true
 		domain := msg.Question[0].Name
+		fmt.Println("Incoming domain" + domain)
 		address, ok := h.Targets[domain]
 		if ok {
 			msg.Answer = append(msg.Answer, &dns.A{
@@ -40,6 +43,8 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 				A:   net.ParseIP(address),
 			})
 		}
+
+		fmt.Println(h.Targets)
 	}
 	w.WriteMsg(&msg)
 }
@@ -48,6 +53,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 func (h *DNSHandler) LoadTargets() {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
+	fmt.Printf("Targets loading")
 
 	h.Targets = h.DBHelper.GetTargetsList()
 }
