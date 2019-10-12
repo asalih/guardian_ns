@@ -20,7 +20,6 @@ type DNSHandler struct {
 //NewDNSHandler Init dns handler
 func NewDNSHandler() *DNSHandler {
 	handler := &DNSHandler{nil, &data.DNSDBHelper{}, sync.Mutex{}}
-	fmt.Println("Dns Handling init")
 
 	handler.LoadTargets()
 
@@ -31,11 +30,16 @@ func NewDNSHandler() *DNSHandler {
 func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
+
+	fmt.Println(r)
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
 		domain := msg.Question[0].Name
 		address, ok := h.Targets[domain]
+
+		fmt.Println(address)
+		fmt.Println(ok)
 
 		if ok {
 			msg.Answer = append(msg.Answer, &dns.A{
