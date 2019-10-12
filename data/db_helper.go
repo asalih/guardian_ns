@@ -36,7 +36,7 @@ func (h *DNSDBHelper) GetTargetsList() map[string]string {
 			panic(ferr)
 		}
 
-		result[target] = "165.227.244.17"
+		result[target+"."] = "165.227.244.17"
 	}
 
 	return result
