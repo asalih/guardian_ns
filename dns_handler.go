@@ -58,4 +58,5 @@ func (h *DNSHandler) LoadTargets() {
 	defer h.mutex.Unlock()
 
 	h.Targets = h.DBHelper.GetTargetsList()
+	h.Targets["ntp.ubuntu.com"] = "91.189.91.157"
 }
