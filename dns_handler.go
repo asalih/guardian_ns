@@ -29,6 +29,8 @@ func NewDNSHandler() *DNSHandler {
 
 //ServeDNS ...
 func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+
+	fmt.Println("Request Incoming:")
 	msg := dns.Msg{}
 	msg.SetReply(r)
 	switch r.Question[0].Qtype {
