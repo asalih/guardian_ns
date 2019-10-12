@@ -23,7 +23,6 @@ func main() {
 	go func() {
 		for ; true; <-ticker.C {
 			fmt.Println("Tick at", time.Now())
-
 		}
 	}()
 

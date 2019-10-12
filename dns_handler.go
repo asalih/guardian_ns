@@ -38,6 +38,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		domain := msg.Question[0].Name
 		address, ok := h.Targets[domain]
 
+		fmt.Println(h.Targets)
 		fmt.Println(address)
 		fmt.Println(ok)
 
