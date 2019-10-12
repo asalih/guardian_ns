@@ -33,7 +33,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	fmt.Println(r)
 	fmt.Println("Qt")
-	fmt.Println(r.Questions)
+	fmt.Println(r.Question)
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
