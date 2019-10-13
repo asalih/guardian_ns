@@ -31,23 +31,15 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 
-	fmt.Println("Incoming Message;")
-
-	fmt.Println(r)
-	fmt.Println("Qt")
-	fmt.Println(r.Question)
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
 		domain := msg.Question[0].Name
 		address, ok := h.Targets[domain]
 
-		fmt.Println("Incoming Domain :" + domain)
-		fmt.Println(h.Targets)
-		fmt.Println(address)
-		fmt.Println(ok)
-
 		if ok {
+			fmt.Println("Found: " + domain)
+
 			msg.Answer = append(msg.Answer, &dns.A{
 				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
 				A:   net.ParseIP(address),
