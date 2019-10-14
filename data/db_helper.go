@@ -2,6 +2,8 @@ package data
 
 import (
 	"database/sql"
+	"strings"
+
 	//_ ...
 	"github.com/asalih/guardian_ns/models"
 	_ "github.com/lib/pq"
