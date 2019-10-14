@@ -41,7 +41,7 @@ func (h *DNSDBHelper) GetTargetsList() map[string]string {
 		result[target+"."] = "165.227.244.17"
 
 		if strings.HasPrefix(target, "www.") {
-			result[strings.ReplaceAll(domain, "www.", "")+"."] = "165.227.244.17"
+			result[strings.ReplaceAll(target, "www.", "")+"."] = "165.227.244.17"
 		} else {
 			result["www."+target+"."] = "165.227.244.17"
 		}
