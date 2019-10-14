@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 
 	"github.com/asalih/guardian_ns/data"
@@ -34,13 +35,13 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
-		domain := msg.Question[0].Name
-		address, ok := h.Targets[domain]
+		target := strings.ToLower(msg.Question[0].Name)
+		address, ok := h.Targets[target]
 
-		fmt.Println("Requested: " + domain)
+		fmt.Println("Requested: " + target)
 		if ok {
 			msg.Answer = append(msg.Answer, &dns.A{
-				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
+				Hdr: dns.RR_Header{Name: target, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
 				A:   net.ParseIP(address),
 			})
 		}
