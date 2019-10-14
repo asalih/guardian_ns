@@ -37,9 +37,8 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		domain := msg.Question[0].Name
 		address, ok := h.Targets[domain]
 
+		fmt.Println("Requested: " + domain)
 		if ok {
-			fmt.Println("Found: " + domain)
-
 			msg.Answer = append(msg.Answer, &dns.A{
 				Hdr: dns.RR_Header{Name: domain, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
 				A:   net.ParseIP(address),
