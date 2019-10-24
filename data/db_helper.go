@@ -38,12 +38,12 @@ func (h *DNSDBHelper) GetTargetsList() map[string]string {
 			panic(ferr)
 		}
 
-		result[target+"."] = "165.227.244.17"
+		result[target+"."] = models.Configuration.GuardianIPAddress
 
 		if strings.HasPrefix(target, "www.") {
-			result[strings.ReplaceAll(target, "www.", "")+"."] = "165.227.244.17"
+			result[strings.ReplaceAll(target, "www.", "")+"."] = models.Configuration.GuardianIPAddress
 		} else {
-			result["www."+target+"."] = "165.227.244.17"
+			result["www."+target+"."] = models.Configuration.GuardianIPAddress
 		}
 	}
 

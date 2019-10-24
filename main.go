@@ -23,6 +23,8 @@ func main() {
 	go func() {
 		for ; true; <-ticker.C {
 			fmt.Println("Tick at", time.Now())
+			_dnsHandler.LoadTargets()
+			fmt.Println("Targets loaded:" + strconv.Itoa(len(_dnsHandler.Targets)))
 		}
 	}()
 

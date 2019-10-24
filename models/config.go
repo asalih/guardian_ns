@@ -9,7 +9,8 @@ import (
 
 //Config Application settings
 type Config struct {
-	ConnectionString string `json:"connectionString"`
+	ConnectionString  string `json:"connectionString"`
+	GuardianIPAddress string `json:"guardianIpAddress"`
 }
 
 //Configuration ...
