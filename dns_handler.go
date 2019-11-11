@@ -7,20 +7,22 @@ import (
 	"sync"
 
 	"github.com/asalih/guardian_ns/data"
+	"github.com/asalih/guardian_ns/models"
 	"github.com/miekg/dns"
 )
 
 //DNSHandler the dns handler
 type DNSHandler struct {
-	Targets  map[string]string
-	DBHelper *data.DNSDBHelper
+	Targets       map[string]net.IP
+	DBHelper      *data.DNSDBHelper
+	IPRateLimiter *models.IPRateLimiter
 
 	mutex sync.Mutex
 }
 
 //NewDNSHandler Init dns handler
 func NewDNSHandler() *DNSHandler {
-	handler := &DNSHandler{nil, &data.DNSDBHelper{}, sync.Mutex{}}
+	handler := &DNSHandler{nil, &data.DNSDBHelper{}, models.NewIPRateLimiter(1, 10), sync.Mutex{}}
 
 	handler.LoadTargets()
 
@@ -32,6 +34,14 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 
+	ipAddress := strings.Split(w.RemoteAddr().String(), ":")[0]
+
+	rateLimiter := h.IPRateLimiter.GetLimiter(ipAddress)
+
+	if rateLimiter != nil && !rateLimiter.Allow() {
+		w.WriteMsg(&msg)
+	}
+
 	switch r.Question[0].Qtype {
 	case dns.TypeA:
 		msg.Authoritative = true
@@ -42,7 +52,7 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		if ok {
 			msg.Answer = append(msg.Answer, &dns.A{
 				Hdr: dns.RR_Header{Name: target, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
-				A:   net.ParseIP(address),
+				A:   address,
 			})
 		}
 	}
@@ -55,5 +65,5 @@ func (h *DNSHandler) LoadTargets() {
 	defer h.mutex.Unlock()
 
 	h.Targets = h.DBHelper.GetTargetsList()
-	h.Targets["ntp.ubuntu.com."] = "91.189.91.157"
+	h.Targets["ntp.ubuntu.com."] = net.ParseIP("91.189.91.157")
 }

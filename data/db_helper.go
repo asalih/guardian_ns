@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"net"
 	"strings"
 
 	//_ ...
@@ -14,7 +15,7 @@ type DNSDBHelper struct {
 }
 
 /*GetTargetsList Reads the Target from database*/
-func (h *DNSDBHelper) GetTargetsList() map[string]string {
+func (h *DNSDBHelper) GetTargetsList() map[string]net.IP {
 	conn, err := sql.Open("postgres", models.Configuration.ConnectionString)
 	defer conn.Close()
 
@@ -28,7 +29,7 @@ func (h *DNSDBHelper) GetTargetsList() map[string]string {
 		panic(qerr)
 	}
 
-	result := make(map[string]string, 0)
+	result := make(map[string]net.IP, 0)
 	for rows.Next() {
 		var target string
 
@@ -38,12 +39,12 @@ func (h *DNSDBHelper) GetTargetsList() map[string]string {
 			panic(ferr)
 		}
 
-		result[target+"."] = models.Configuration.GuardianIPAddress
+		result[target+"."] = net.ParseIP(models.Configuration.GuardianIPAddress)
 
 		if strings.HasPrefix(target, "www.") {
-			result[strings.ReplaceAll(target, "www.", "")+"."] = models.Configuration.GuardianIPAddress
+			result[strings.ReplaceAll(target, "www.", "")+"."] = net.ParseIP(models.Configuration.GuardianIPAddress)
 		} else {
-			result["www."+target+"."] = models.Configuration.GuardianIPAddress
+			result["www."+target+"."] = net.ParseIP(models.Configuration.GuardianIPAddress)
 		}
 	}
 
