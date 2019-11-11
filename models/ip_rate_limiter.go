@@ -38,7 +38,7 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 			fmt.Println("IP remover Tick at", time.Now())
 
 			for key, lim := range i.ips {
-				if time.Now().Sub(lim.lastTime).Hours() > 1 {
+				if time.Now().Sub(lim.lastTime).Minutes() > 5 {
 					delete(i.ips, key)
 				}
 			}
