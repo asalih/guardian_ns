@@ -30,7 +30,7 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 		b:   b,
 	}
 
-	ticker := time.NewTicker(5 * time.Minute)
+	ticker := time.NewTicker(2 * time.Minute)
 	defer ticker.Stop()
 
 	go func() {
@@ -39,6 +39,7 @@ func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 
 			for key, lim := range i.ips {
 				if time.Now().Sub(lim.lastTime).Minutes() > 5 {
+					fmt.Println("key removed: " + key)
 					delete(i.ips, key)
 				}
 			}
