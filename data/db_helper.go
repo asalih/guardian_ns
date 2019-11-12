@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"net"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 
 	//_ ...
 	"github.com/asalih/guardian_ns/models"
@@ -49,4 +52,28 @@ func (h *DNSDBHelper) GetTargetsList() map[string]net.IP {
 	}
 
 	return result
+}
+
+//LogThrottle ...
+func (h *DNSDBHelper) LogThrottleRequest(ipAddress string) {
+	conn, err := sql.Open("postgres", models.Configuration.ConnectionString)
+	defer conn.Close()
+
+	if err != nil {
+		panic(err)
+	}
+
+	sqlStatement := `
+INSERT INTO "ThrottleLogs" ("Id", "CreatedAt", "IPAddress", "ThrottleType")
+VALUES ($1, $2, $3, $4)`
+
+	_, err = conn.Exec(sqlStatement,
+		uuid.New(),
+		time.Now(),
+		ipAddress,
+		0)
+
+	if err != nil {
+		panic(err)
+	}
 }

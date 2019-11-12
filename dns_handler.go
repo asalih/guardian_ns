@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	"golang.org/x/time/rate"
+
 	"github.com/asalih/guardian_ns/data"
 	"github.com/asalih/guardian_ns/models"
 	"github.com/miekg/dns"
@@ -22,7 +24,10 @@ type DNSHandler struct {
 
 //NewDNSHandler Init dns handler
 func NewDNSHandler() *DNSHandler {
-	handler := &DNSHandler{nil, &data.DNSDBHelper{}, models.NewIPRateLimiter(1, 10), sync.Mutex{}}
+	handler := &DNSHandler{nil, &data.DNSDBHelper{},
+		models.NewIPRateLimiter(rate.Limit(models.Configuration.RateLimitSec),
+			models.Configuration.RateLimitBurst),
+		sync.Mutex{}}
 
 	handler.LoadTargets()
 
@@ -34,12 +39,11 @@ func (h *DNSHandler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	msg := dns.Msg{}
 	msg.SetReply(r)
 
-	ipAddress := strings.Split(w.RemoteAddr().String(), ":")[0]
-
-	rateLimiter := h.IPRateLimiter.GetLimiter(ipAddress)
-
-	if rateLimiter != nil && !rateLimiter.Allow() {
+	if !h.IPRateLimiter.IsAllowed(w.RemoteAddr().String()) {
 		w.WriteMsg(&msg)
+		go h.DBHelper.LogThrottleRequest(w.RemoteAddr().String())
+
+		return
 	}
 
 	switch r.Question[0].Qtype {

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -77,4 +78,22 @@ func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
 	i.mu.Unlock()
 
 	return limiter.rateLimiter
+}
+
+func (i *IPRateLimiter) GetLimiterIP(ip string) *rate.Limiter {
+	ipAddress := strings.Split(ip, ":")[0]
+
+	return i.GetLimiter(ipAddress)
+}
+
+func (i *IPRateLimiter) IsAllowed(ip string) bool {
+	ipAddress := strings.Split(ip, ":")[0]
+
+	rateLimiter := i.GetLimiter(ipAddress)
+
+	if rateLimiter != nil && !rateLimiter.Allow() {
+		return false
+	}
+
+	return true
 }

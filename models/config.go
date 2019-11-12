@@ -11,6 +11,8 @@ import (
 type Config struct {
 	ConnectionString  string `json:"connectionString"`
 	GuardianIPAddress string `json:"guardianIpAddress"`
+	RateLimitSec      int    `json:"rateLimitSec"`
+	RateLimitBurst    int    `json:"rateLimitBurst"`
 }
 
 //Configuration ...
